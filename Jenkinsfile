@@ -17,7 +17,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 // Commands to deploy your application
-                sh 'cp target/my-application.war /path/to/tomcat/webapps/'
+                sh 'cp target/WebAppCal-0.0.6.war /path/to/tomcat/webapps/'
             }
         }
     }
