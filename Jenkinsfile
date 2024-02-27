@@ -28,9 +28,9 @@ pipeline {
             }
         }
         
-        stage('Deploy to Tomcat') {
+        stage('Deploy to node 1') {
             agent {
-                label 'tomcat'
+                label 'node 1'
             }
             steps {
                 // Commands to deploy your application
