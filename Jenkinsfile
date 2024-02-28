@@ -1,52 +1,55 @@
 pipeline {
-    agent any
-
-    tools {
-        maven 'Maven'
-        jdk 'Java11'
+    agent {
+        label 'node 1'
     }
-    
+
     stages {
-        stage('Checkout') {
+        stage('SCM Checkout') {
             steps {
-                git 'https://github.com/chikababy/Jenkinscicdfinal.git'
+                script {
+                    git tool: 'Default', credentialsId: 'git-cred', url: 'https://github.com/chikababy/Jenkinscicdfinal.git'
+                }
             }
         }
-        
-        stage('Build') {
-            steps {
-                // Commands to build your project
-                sh 'mvn clean package'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                // Commands to run tests
-                sh 'mvn test'
-                stash(name: 'packaged_code', includes: 'target/*.war')
-            }
-        }
-        
-        stage('Deploy to node 1') {
-            agent {
-                label 'node 1'
-            }
-            steps {
-                // Commands to deploy your application
-                unstash 'packaged_code'
-                sh "sudo rm -rf ~/apache*/webapps/*.war"
-                sh "sudo mv target/*.war ~/apache*/webapps/"
-                sh "sudo ~/apache*/bin/shutdown.sh && sudo ~/apache*/bin/startup.sh"
-            }
-        }
-    }
 
-    post {
-        always {
-            emailtext body: 'Check console output at $BUILD_URL to view the results.',
-                     subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
-                     to: 'okorjichika.co@gmail.com'
+        stage('Mvn Package') {
+            steps {
+                script {
+                    def mvnHome = tool name: 'apache-maven-3.9.5', type: 'maven'
+                    def mvnCMD = "${mvnHome}/bin/mvn"
+                    
+                    // Build and test in a single step
+                    sh "${mvnCMD} clean package test"
+                    stash(name: "Jenkinscicdfinal", includes: "target/*.war")
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            agent {
+                label 'tomcat'
+            }
+            steps {
+                echo "Deploying the application"
+                script {
+                    // Create the target directory if it doesn't exist
+                    sh "sudo mkdir -p /home/centos/apache-tomcat-7.0.94/webapps/"
+
+                    // Remove existing WAR files
+                    sh "sudo rm -rf /home/centos/apache-tomcat-7.0.94/webapps/*.war"
+
+                    unstash "Jenkinscicdfinal"
+
+                    // Move the WAR file to the target directory
+                    sh "sudo mv target/*.war /home/centos/apache-tomcat-7.0.94/webapps/"
+
+                    // Reload systemd daemon
+                    sh "sudo systemctl daemon-reload"
+
+                    // Restart Tomcat
+                    sh "sudo /home/centos/apache-tomcat-7.0.94/bin/startup.sh"
+                }
+            }
         }
     }
 }
