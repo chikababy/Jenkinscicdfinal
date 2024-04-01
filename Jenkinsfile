@@ -18,7 +18,7 @@ pipeline {
                     def mvnHome = tool name: 'apache-maven-3.0.5', type: 'maven'
                     def mvnCMD = "${mvnHome}/bin/mvn"
                     
-                    // Build and test in a single step
+                    // Build and test a single step
                     sh "${mvnCMD} clean package test"
                     stash(name: "Jenkinscicdfinal", includes: "target/*.war")
                 }
