@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'node 1'
+        label 'node1'
     }
 
     stages {
@@ -15,7 +15,7 @@ pipeline {
         stage('Mvn Package') {
             steps {
                 script {
-                    def mvnHome = tool name: 'apache-maven-3.0.5', type: 'maven'
+                    def mvnHome = tool name: 'apache-maven-3.9.6', type: 'maven'
                     def mvnCMD = "${mvnHome}/bin/mvn"
                     
                     // Build and test a single step
