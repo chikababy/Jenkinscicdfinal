@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     def mvnHome = tool name: 'apache-maven-3.9.6', type: 'maven'
-                    def mvnCMD = "${mvnHome}/bin/mvn"
+                    def mvnCMD = "${mvnHome}/opt/mvn"
                     
                     // Build and test a single step
                     sh "${mvnCMD} clean package test"
