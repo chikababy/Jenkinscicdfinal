@@ -11,8 +11,8 @@ pipeline {
                 }
             }
         }
-
-        stage('Mvn Package') {
+        
+ stage('Mvn Package') {
             steps {
                 script {
                     def mvnCMD = "/opt/apache-maven-3.9.6/bin/mvn"
@@ -24,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Application') {
+            stage('Deploy Application') {
             agent {
                 label 'node1'
             }
@@ -34,7 +34,7 @@ pipeline {
                     // Download and install Apache Tomcat
                     def tomcatUrl = 'https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.99/bin/apache-tomcat-8.5.99.tar.gz'
                     sh "wget -q -O tomcat.tar.gz ${tomcatUrl}"
-                    sh "sudo tar -xzf tomcat.tar.gz -C /opt"
+                    sh "sudo tar -xzf tomcat.tar.gz -C /home/centos/apache-tomcat-7.0.94/webapps"
 
                     // Create the target directory if it doesn't exist
                     sh "sudo mkdir -p /home/centos/apache-tomcat-7.0.94/webapps/"
